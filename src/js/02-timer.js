@@ -25,25 +25,28 @@ const options = {
     const selectedDate = selectedDates[0];
     if (selectedDate > new Date()) {
       startButton.removeAttribute("disabled");
-      let timeDifference = selectedDate - new Date();
+        let timeDifference = selectedDate - new Date();
+        
+         const timer = setInterval(() => {
+        if (timeDifference <= 0) {
+            clearInterval(timer);
+            datetimePicker.config.enable = true;
+            datetimePicker.clear();
+            startButton.setAttribute("disabled", true);
+        } else {
 
-      const timer = setInterval(() => {
-        const { days, hours, minutes, seconds } = convertMs(timeDifference);
+      const { days, hours, minutes, seconds } = convertMs(timeDifference);
           daysElement.textContent = days.toString().padStart(2, "0");
           hoursElement.textContent = hours.toString().padStart(2, "0");
           minutesElement.textContent = minutes.toString().padStart(2, "0");
           secondsElement.textContent = seconds.toString().padStart(2, "0");
-
-        if (timeDifference <= 0) {
-          clearInterval(timer);
-          startButton.setAttribute("disabled", true);
-        } else {
           timeDifference -= 1000;
         }
       }, 1000);
     } else {
       Notiflix.Notify.failure("Please choose a date in the future");
       startButton.setAttribute("disabled", true);
+      datetimePicker.clear();
     }
   },
 };
@@ -55,4 +58,28 @@ const hoursElement = document.querySelector("[data-hours]");
 const minutesElement = document.querySelector("[data-minutes]");
 const secondsElement = document.querySelector("[data-seconds]");
 
+startButton.addEventListener("click", () => {
+  if (datetimePicker.input.value) {
+        datetimePicker.config.enable = false;
+      const selectedDate = new Date(datetimePicker.selectedDates[0]);
+    let timeDifference = selectedDate - new Date();
 
+    const timer = setInterval(() => {
+      if (timeDifference <= 0) {
+        clearInterval(timer);
+            datetimePicker.config.enable = true;
+           datetimePicker.clear(); 
+        startButton.setAttribute("disabled", true);
+        } else {
+          const { days, hours, minutes, seconds } = convertMs(timeDifference);
+        daysElement.textContent = days.toString().padStart(2, "0");
+        hoursElement.textContent = hours.toString().padStart(2, "0");
+        minutesElement.textContent = minutes.toString().padStart(2, "0");
+        secondsElement.textContent = seconds.toString().padStart(2, "0");
+        timeDifference -= 1000;
+      }
+    }, 1000);
+  } else {
+    Notiflix.Notify.failure("Please choose a date to start the timer");
+  }
+});
